@@ -2,6 +2,7 @@ import { useState, useRef } from 'react';
 import { Copy, Upload, FileText, Image as ImageIcon, Check, Loader2 } from 'lucide-react';
 import { saveItem } from '@/store/clipboardStore';
 import { ToastData } from './Toast';
+import { QuickRetrieve } from './QuickRetrieve';
 
 type TabType = 'text' | 'image';
 
@@ -212,6 +213,9 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
       </button>
 
       {/* Generated Code Display */}
+      {/* Quick Retrieve Section */}
+      <QuickRetrieve onToast={onToast} />
+
       {generatedCode && (
         <div className="mt-6 p-5 bg-card rounded-xl border border-border animate-fade-in">
           <p className="text-sm text-muted-foreground mb-3 text-center">
