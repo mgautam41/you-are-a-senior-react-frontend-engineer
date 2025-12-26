@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Search, Loader2, Copy, Check, AlertCircle } from 'lucide-react';
-import { getItem, ClipboardItem } from '@/store/clipboardStore';
+import { retrieveText, retrieveImage } from '@/services/api';
 import { ToastData } from './Toast';
 
 interface QuickRetrieveProps {
@@ -10,7 +10,7 @@ interface QuickRetrieveProps {
 export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
   const [code, setCode] = useState(['', '', '', '']);
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<ClipboardItem | null>(null);
+  const [result, setResult] = useState<{ type: 'text' | 'image'; content: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -58,19 +58,28 @@ export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
     setResult(null);
     setError(null);
 
-    await new Promise((resolve) => setTimeout(resolve, 600));
-
-    const item = getItem(fullCode);
-
-    if (item) {
-      setResult(item);
-      onToast({ type: 'success', message: 'Content retrieved successfully!' });
-    } else {
+    try {
+      // Try to retrieve as text first
+      try {
+        const text = await retrieveText(fullCode);
+        setResult({ type: 'text', content: text });
+        onToast({ type: 'success', message: 'Content retrieved successfully!' });
+      } catch (textError) {
+        // If text retrieval fails, try image
+        try {
+          const imageUrl = await retrieveImage(fullCode);
+          setResult({ type: 'image', content: imageUrl });
+          onToast({ type: 'success', message: 'Content retrieved successfully!' });
+        } catch (imageError) {
+          throw new Error('No content found with this code');
+        }
+      }
+    } catch (error) {
       setError('No content found with this code');
       onToast({ type: 'error', message: 'Code not found' });
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleCopyContent = async () => {
@@ -129,10 +138,9 @@ export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
             w-full py-2.5 px-4 rounded-lg font-medium text-sm
             flex items-center justify-center gap-2
             transition-all duration-150
-            ${
-              !isCodeComplete || isLoading
-                ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                : 'bg-secondary text-secondary-foreground hover:opacity-90'
+            ${!isCodeComplete || isLoading
+              ? 'bg-muted text-muted-foreground cursor-not-allowed'
+              : 'bg-secondary text-secondary-foreground hover:opacity-90'
             }
           `}
         >

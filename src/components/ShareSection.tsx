@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { Copy, Upload, FileText, Image as ImageIcon, Check, Loader2 } from 'lucide-react';
-import { saveItem } from '@/store/clipboardStore';
+import { saveText, uploadImage } from '@/services/api';
 import { ToastData } from './Toast';
 import { QuickRetrieve } from './QuickRetrieve';
 
@@ -15,6 +15,7 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
   const [textContent, setTextContent] = useState('');
   const [imageContent, setImageContent] = useState<string | null>(null);
   const [imageName, setImageName] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [generatedCode, setGeneratedCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
@@ -36,6 +37,7 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
       return;
     }
 
+    setImageFile(file);
     const reader = new FileReader();
     reader.onload = (event) => {
       setImageContent(event.target?.result as string);
@@ -48,15 +50,26 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
     setIsLoading(true);
     setGeneratedCode(null);
 
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 800));
+    try {
+      let code: string;
 
-    const content = activeTab === 'text' ? textContent : imageContent!;
-    const code = saveItem(activeTab, content);
+      if (activeTab === 'text') {
+        code = await saveText(textContent);
+      } else {
+        if (!imageFile) {
+          throw new Error('No image file selected');
+        }
+        const result = await uploadImage(imageFile);
+        code = result.code;
+      }
 
-    setGeneratedCode(code);
-    setIsLoading(false);
-    onToast({ type: 'success', message: 'Content shared successfully!' });
+      setGeneratedCode(code);
+      onToast({ type: 'success', message: 'Content shared successfully!' });
+    } catch (error) {
+      onToast({ type: 'error', message: 'Failed to share content. Please try again.' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleCopyCode = async () => {
@@ -76,6 +89,7 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
     setTextContent('');
     setImageContent(null);
     setImageName(null);
+    setImageFile(null);
     setGeneratedCode(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
@@ -97,10 +111,9 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
           className={`
             flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md
             text-sm font-medium transition-all duration-150
-            ${
-              activeTab === 'text'
-                ? 'bg-card text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+            ${activeTab === 'text'
+              ? 'bg-card text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
             }
           `}
         >
@@ -115,10 +128,9 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
           className={`
             flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md
             text-sm font-medium transition-all duration-150
-            ${
-              activeTab === 'image'
-                ? 'bg-card text-foreground shadow-sm'
-                : 'text-muted-foreground hover:text-foreground'
+            ${activeTab === 'image'
+              ? 'bg-card text-foreground shadow-sm'
+              : 'text-muted-foreground hover:text-foreground'
             }
           `}
         >
@@ -195,10 +207,9 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
           w-full py-3 px-4 rounded-lg font-medium text-sm
           flex items-center justify-center gap-2
           transition-all duration-150
-          ${
-            isSubmitDisabled || isLoading
-              ? 'bg-muted text-muted-foreground cursor-not-allowed'
-              : 'bg-primary text-primary-foreground hover:opacity-90'
+          ${isSubmitDisabled || isLoading
+            ? 'bg-muted text-muted-foreground cursor-not-allowed'
+            : 'bg-primary text-primary-foreground hover:opacity-90'
           }
         `}
       >
