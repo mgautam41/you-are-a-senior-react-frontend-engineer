@@ -13,7 +13,6 @@ export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
   const [result, setResult] = useState<ClipboardItem | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isCopied, setIsCopied] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
   const fullCode = code.join('');
@@ -95,132 +94,118 @@ export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
 
   return (
     <div className="mt-8 border-t border-border pt-6">
-      <button
-        onClick={() => setIsExpanded(!isExpanded)}
-        className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-150"
-      >
+      <div className="flex items-center gap-2 text-sm font-medium mb-4">
         <Search className="w-4 h-4" />
-        <span>Have a code? Retrieve content here</span>
-        <span
-          className={`transition-transform duration-200 ${isExpanded ? 'rotate-180' : ''}`}
-        >
-          ▼
-        </span>
-      </button>
+        <span>Retrieve Content</span>
+      </div>
 
-      <div
-        className={`overflow-hidden transition-all duration-300 ease-out ${
-          isExpanded ? 'max-h-[500px] opacity-100 mt-4' : 'max-h-0 opacity-0'
-        }`}
-      >
-        <div className="bg-muted/50 rounded-xl p-5">
-          <p className="text-sm text-muted-foreground mb-4">
-            Enter a 4-digit code to retrieve shared content
-          </p>
+      <div className="bg-muted/50 rounded-xl p-5">
+        <p className="text-sm text-muted-foreground mb-4">
+          Enter a 4-digit code to retrieve shared content
+        </p>
 
-          {/* Code Input */}
-          <div className="flex justify-center gap-2 mb-4">
-            {code.map((digit, i) => (
-              <input
-                key={i}
-                ref={(el) => (inputRefs.current[i] = el)}
-                type="text"
-                inputMode="numeric"
-                maxLength={4}
-                value={digit}
-                onChange={(e) => handleInputChange(i, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(i, e)}
-                className="w-11 h-12 text-center text-lg font-semibold bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-150"
-              />
-            ))}
-          </div>
-
-          {/* Fetch Button */}
-          <button
-            onClick={handleFetch}
-            disabled={!isCodeComplete || isLoading}
-            className={`
-              w-full py-2.5 px-4 rounded-lg font-medium text-sm
-              flex items-center justify-center gap-2
-              transition-all duration-150
-              ${
-                !isCodeComplete || isLoading
-                  ? 'bg-muted text-muted-foreground cursor-not-allowed'
-                  : 'bg-secondary text-secondary-foreground hover:opacity-90'
-              }
-            `}
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Fetching...
-              </>
-            ) : (
-              <>
-                <Search className="w-4 h-4" />
-                Retrieve
-              </>
-            )}
-          </button>
-
-          {/* Error State */}
-          {error && (
-            <div className="mt-4 p-3 bg-destructive/10 rounded-lg border border-destructive/30 animate-fade-in">
-              <div className="flex items-center gap-2 text-destructive">
-                <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                <p className="text-sm">{error}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Result Display */}
-          {result && (
-            <div className="mt-4 p-4 bg-card rounded-lg border border-border animate-fade-in">
-              <div className="flex items-center justify-between mb-2">
-                <span className="text-xs text-muted-foreground">
-                  {result.type === 'text' ? 'Shared Text' : 'Shared Image'}
-                </span>
-                {result.type === 'text' && (
-                  <button
-                    onClick={handleCopyContent}
-                    className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-muted hover:bg-muted/80 transition-colors duration-150"
-                  >
-                    {isCopied ? (
-                      <>
-                        <Check className="w-3 h-3 text-success" />
-                        Copied
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="w-3 h-3" />
-                        Copy
-                      </>
-                    )}
-                  </button>
-                )}
-              </div>
-
-              {result.type === 'text' ? (
-                <p className="text-sm whitespace-pre-wrap break-words max-h-32 overflow-y-auto">
-                  {result.content}
-                </p>
-              ) : (
-                <img
-                  src={result.content}
-                  alt="Shared content"
-                  className="max-h-32 rounded mx-auto object-contain"
-                />
-              )}
-
-              <button
-                onClick={handleReset}
-                className="w-full mt-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors duration-150"
-              >
-                Clear
-              </button>
-            </div>
-          )}
+        {/* Code Input */}
+        <div className="flex justify-center gap-2 mb-4">
+          {code.map((digit, i) => (
+            <input
+              key={i}
+              ref={(el) => (inputRefs.current[i] = el)}
+              type="text"
+              inputMode="numeric"
+              maxLength={4}
+              value={digit}
+              onChange={(e) => handleInputChange(i, e.target.value)}
+              onKeyDown={(e) => handleKeyDown(i, e)}
+              className="w-11 h-12 text-center text-lg font-semibold bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-150"
+            />
+          ))}
         </div>
+
+        {/* Fetch Button */}
+        <button
+          onClick={handleFetch}
+          disabled={!isCodeComplete || isLoading}
+          className={`
+            w-full py-2.5 px-4 rounded-lg font-medium text-sm
+            flex items-center justify-center gap-2
+            transition-all duration-150
+            ${
+              !isCodeComplete || isLoading
+                ? 'bg-muted text-muted-foreground cursor-not-allowed'
+                : 'bg-secondary text-secondary-foreground hover:opacity-90'
+            }
+          `}
+        >
+          {isLoading ? (
+            <>
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Fetching...
+            </>
+          ) : (
+            <>
+              <Search className="w-4 h-4" />
+              Retrieve
+            </>
+          )}
+        </button>
+
+        {/* Error State */}
+        {error && (
+          <div className="mt-4 p-3 bg-destructive/10 rounded-lg border border-destructive/30 animate-fade-in">
+            <div className="flex items-center gap-2 text-destructive">
+              <AlertCircle className="w-4 h-4 flex-shrink-0" />
+              <p className="text-sm">{error}</p>
+            </div>
+          </div>
+        )}
+
+        {/* Result Display */}
+        {result && (
+          <div className="mt-4 p-4 bg-card rounded-lg border border-border animate-fade-in">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-muted-foreground">
+                {result.type === 'text' ? 'Shared Text' : 'Shared Image'}
+              </span>
+              {result.type === 'text' && (
+                <button
+                  onClick={handleCopyContent}
+                  className="flex items-center gap-1 px-2 py-1 rounded text-xs bg-muted hover:bg-muted/80 transition-colors duration-150"
+                >
+                  {isCopied ? (
+                    <>
+                      <Check className="w-3 h-3 text-success" />
+                      Copied
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3" />
+                      Copy
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {result.type === 'text' ? (
+              <p className="text-sm whitespace-pre-wrap break-words max-h-32 overflow-y-auto">
+                {result.content}
+              </p>
+            ) : (
+              <img
+                src={result.content}
+                alt="Shared content"
+                className="max-h-32 rounded mx-auto object-contain"
+              />
+            )}
+
+            <button
+              onClick={handleReset}
+              className="w-full mt-3 py-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors duration-150"
+            >
+              Clear
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

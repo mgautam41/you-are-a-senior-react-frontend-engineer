@@ -1,20 +1,11 @@
-import { Share2, Download, Menu, X, Clipboard } from 'lucide-react';
-
-type View = 'share' | 'get';
+import { Share2, Menu, X, Clipboard } from 'lucide-react';
 
 interface SidebarProps {
-  currentView: View;
-  onViewChange: (view: View) => void;
   isOpen: boolean;
   onToggle: () => void;
 }
 
-const navItems: { id: View; label: string; icon: React.ReactNode }[] = [
-  { id: 'share', label: 'Share', icon: <Share2 className="w-5 h-5" /> },
-  { id: 'get', label: 'Get', icon: <Download className="w-5 h-5" /> },
-];
-
-export const Sidebar = ({ currentView, onViewChange, isOpen, onToggle }: SidebarProps) => {
+export const Sidebar = ({ isOpen, onToggle }: SidebarProps) => {
   return (
     <>
       {/* Mobile menu button */}
@@ -56,28 +47,12 @@ export const Sidebar = ({ currentView, onViewChange, isOpen, onToggle }: Sidebar
         {/* Navigation */}
         <nav className="flex-1 p-3">
           <ul className="space-y-1">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <button
-                  onClick={() => {
-                    onViewChange(item.id);
-                    if (window.innerWidth < 1024) onToggle();
-                  }}
-                  className={`
-                    w-full flex items-center gap-3 px-3 py-2.5 rounded-lg
-                    text-sm font-medium transition-all duration-150
-                    ${
-                      currentView === item.id
-                        ? 'bg-sidebar-primary text-sidebar-primary-foreground'
-                        : 'text-sidebar-foreground hover:bg-sidebar-accent'
-                    }
-                  `}
-                >
-                  {item.icon}
-                  {item.label}
-                </button>
-              </li>
-            ))}
+            <li>
+              <div className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium bg-sidebar-primary text-sidebar-primary-foreground">
+                <Share2 className="w-5 h-5" />
+                Share
+              </div>
+            </li>
           </ul>
         </nav>
 
