@@ -37,13 +37,13 @@ export const Toast = ({ toast, onDismiss }: ToastProps) => {
   const handleTouchMove = (e: React.TouchEvent) => {
     if (touchStart === null) return;
     const diff = e.touches[0].clientY - touchStart;
-    if (diff > 0) {
+    if (diff < 0) {
       setTranslateY(diff);
     }
   };
 
   const handleTouchEnd = () => {
-    if (translateY > 50) {
+    if (translateY < -50) {
       handleDismiss();
     } else {
       setTranslateY(0);
@@ -56,7 +56,7 @@ export const Toast = ({ toast, onDismiss }: ToastProps) => {
       className={`
         flex items-center gap-3 px-4 py-3 rounded-lg shadow-lg border
         bg-card text-card-foreground border-border
-        ${isExiting ? 'animate-slide-down' : 'animate-slide-up'}
+        ${isExiting ? 'animate-slide-up' : 'animate-slide-down'}
         transition-transform duration-150 ease-out
       `}
       style={{ transform: `translateY(${translateY}px)` }}
@@ -87,7 +87,7 @@ interface ToastContainerProps {
 
 export const ToastContainer = ({ toasts, onDismiss }: ToastContainerProps) => {
   return (
-    <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2">
+    <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex flex-col gap-2">
       {toasts.map((toast) => (
         <Toast key={toast.id} toast={toast} onDismiss={onDismiss} />
       ))}

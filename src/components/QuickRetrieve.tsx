@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Search, Loader2, Copy, Check, AlertCircle } from 'lucide-react';
 import { retrieveText, retrieveImage } from '@/services/api';
 import { ToastData } from './Toast';
@@ -81,6 +81,14 @@ export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
       setIsLoading(false);
     }
   };
+
+  // Auto-fetch when code is complete
+  useEffect(() => {
+    if (isCodeComplete && !isLoading && !result) {
+      handleFetch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isCodeComplete, fullCode]);
 
   const handleCopyContent = async () => {
     if (!result || result.type !== 'text') return;
