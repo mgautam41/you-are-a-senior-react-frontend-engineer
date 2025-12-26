@@ -1,12 +1,10 @@
 import { useState, useCallback } from 'react';
-import { Sidebar } from '@/components/Sidebar';
 import { ShareSection } from '@/components/ShareSection';
 import { ToastContainer, ToastData } from '@/components/Toast';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { ThemeProvider } from '@/hooks/useTheme';
 
 const IndexContent = () => {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
   const addToast = useCallback((toast: Omit<ToastData, 'id'>) => {
@@ -19,25 +17,14 @@ const IndexContent = () => {
   }, []);
 
   return (
-    <div className="min-h-screen flex w-full">
-      <Sidebar
-        isOpen={sidebarOpen}
-        onToggle={() => setSidebarOpen(!sidebarOpen)}
-      />
+    <div className="min-h-screen w-full">
+      {/* Fixed Theme Toggle Button */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle />
+      </div>
 
-      <main className="flex-1 min-h-screen">
-        {/* Header with theme toggle */}
-        <header className="sticky top-0 z-20 bg-background/80 backdrop-blur-sm border-b border-border">
-          <div className="flex items-center justify-end h-14 px-4 lg:px-8">
-            <ThemeToggle />
-          </div>
-        </header>
-
-        <div className="h-full px-4 py-8 lg:px-8 lg:py-12">
-          <div className="max-w-2xl mx-auto pt-8 lg:pt-0">
-            <ShareSection onToast={addToast} />
-          </div>
-        </div>
+      <main className="min-h-screen px-4 py-8">
+        <ShareSection onToast={addToast} />
       </main>
 
       <ToastContainer toasts={toasts} onDismiss={removeToast} />
