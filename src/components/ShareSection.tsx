@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react';
-import { Copy, Upload, FileText, Image as ImageIcon, Check, Loader2 } from 'lucide-react';
+import { Copy, Upload, FileText, Image as ImageIcon, Check, Loader2, Share2 } from 'lucide-react';
 import { saveText, uploadImage } from '@/services/api';
 import { ToastData } from './Toast';
 import { QuickRetrieve } from './QuickRetrieve';
@@ -95,25 +95,31 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
   };
 
   return (
-    <div className="max-w-xl mx-auto">
-      <h1 className="text-2xl font-semibold mb-2">Share Content</h1>
-      <p className="text-muted-foreground mb-6">
-        Upload text or an image to get a 4-digit sharing code
-      </p>
+    <div className="animate-fade-in">
+      {/* Header */}
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
+          <Share2 className="w-5 h-5 text-primary" />
+        </div>
+        <div>
+          <h1 className="text-xl font-semibold">Share Content</h1>
+          <p className="text-sm text-muted-foreground">Upload text or image to get a sharing code</p>
+        </div>
+      </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 p-1 bg-muted rounded-lg mb-6">
+      <div className="flex gap-1 p-1.5 bg-muted rounded-xl mb-6">
         <button
           onClick={() => {
             setActiveTab('text');
             setGeneratedCode(null);
           }}
           className={`
-            flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md
-            text-sm font-medium transition-all duration-150
+            flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg
+            text-sm font-medium transition-all duration-200
             ${activeTab === 'text'
-              ? 'bg-card text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-card text-foreground shadow-md scale-[1.02]'
+              : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
             }
           `}
         >
@@ -126,11 +132,11 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
             setGeneratedCode(null);
           }}
           className={`
-            flex-1 flex items-center justify-center gap-2 py-2.5 px-4 rounded-md
-            text-sm font-medium transition-all duration-150
+            flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg
+            text-sm font-medium transition-all duration-200
             ${activeTab === 'image'
-              ? 'bg-card text-foreground shadow-sm'
-              : 'text-muted-foreground hover:text-foreground'
+              ? 'bg-card text-foreground shadow-md scale-[1.02]'
+              : 'text-muted-foreground hover:text-foreground hover:bg-card/50'
             }
           `}
         >
@@ -140,13 +146,13 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
       </div>
 
       {/* Content Area */}
-      <div className="bg-card rounded-xl border border-border p-5 mb-6">
+      <div className="bg-card rounded-xl border border-border p-5 mb-5 transition-all duration-200 hover:border-primary/20">
         {activeTab === 'text' ? (
           <textarea
             value={textContent}
             onChange={(e) => setTextContent(e.target.value)}
             placeholder="Paste or type your text here..."
-            className="w-full h-40 bg-transparent resize-none text-sm placeholder:text-muted-foreground focus:outline-none"
+            className="w-full h-44 bg-transparent resize-none text-sm placeholder:text-muted-foreground focus:outline-none leading-relaxed"
           />
         ) : (
           <div>
@@ -163,7 +169,7 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
                 <img
                   src={imageContent}
                   alt="Preview"
-                  className="max-h-48 rounded-lg mx-auto object-contain"
+                  className="max-h-52 rounded-lg mx-auto object-contain"
                 />
                 <div className="flex items-center justify-between">
                   <span className="text-sm text-muted-foreground truncate max-w-[200px]">
@@ -173,9 +179,10 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
                     onClick={() => {
                       setImageContent(null);
                       setImageName(null);
+                      setImageFile(null);
                       if (fileInputRef.current) fileInputRef.current.value = '';
                     }}
-                    className="text-sm text-destructive hover:underline"
+                    className="text-sm text-destructive hover:underline transition-colors duration-150"
                   >
                     Remove
                   </button>
@@ -184,14 +191,14 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
             ) : (
               <label
                 htmlFor="image-upload"
-                className="flex flex-col items-center justify-center h-40 border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors duration-150"
+                className="flex flex-col items-center justify-center h-44 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-all duration-200"
               >
-                <Upload className="w-8 h-8 text-muted-foreground mb-2" />
-                <span className="text-sm text-muted-foreground">
+                <Upload className="w-10 h-10 text-muted-foreground mb-3" />
+                <span className="text-sm text-muted-foreground font-medium">
                   Click to upload an image
                 </span>
                 <span className="text-xs text-muted-foreground mt-1">
-                  Max 5MB
+                  PNG, JPG up to 5MB
                 </span>
               </label>
             )}
@@ -204,12 +211,12 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
         onClick={handleSubmit}
         disabled={isSubmitDisabled || isLoading}
         className={`
-          w-full py-3 px-4 rounded-lg font-medium text-sm
+          w-full py-3.5 px-4 rounded-xl font-medium text-sm
           flex items-center justify-center gap-2
-          transition-all duration-150
+          transition-all duration-200 transform
           ${isSubmitDisabled || isLoading
             ? 'bg-muted text-muted-foreground cursor-not-allowed'
-            : 'bg-primary text-primary-foreground hover:opacity-90'
+            : 'bg-primary text-primary-foreground hover:opacity-90 hover:scale-[1.01] active:scale-[0.99] shadow-lg shadow-primary/20'
           }
         `}
       >
@@ -219,17 +226,17 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
             Generating code...
           </>
         ) : (
-          'Generate Share Code'
+          <>
+            <Share2 className="w-4 h-4" />
+            Generate Share Code
+          </>
         )}
       </button>
 
       {/* Generated Code Display */}
-      {/* Quick Retrieve Section */}
-      <QuickRetrieve onToast={onToast} />
-
       {generatedCode && (
-        <div className="mt-6 p-5 bg-card rounded-xl border border-border animate-fade-in">
-          <p className="text-sm text-muted-foreground mb-3 text-center">
+        <div className="mt-5 p-6 bg-card rounded-xl border border-success/30 animate-scale-in">
+          <p className="text-sm text-muted-foreground mb-4 text-center">
             Your sharing code
           </p>
           <div className="flex items-center justify-center gap-3">
@@ -237,7 +244,8 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
               {generatedCode.split('').map((digit, i) => (
                 <div
                   key={i}
-                  className="w-12 h-14 flex items-center justify-center bg-muted rounded-lg text-2xl font-semibold"
+                  className="w-14 h-16 flex items-center justify-center bg-muted rounded-xl text-2xl font-bold animate-scale-in"
+                  style={{ animationDelay: `${i * 75}ms` }}
                 >
                   {digit}
                 </div>
@@ -245,7 +253,7 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
             </div>
             <button
               onClick={handleCopyCode}
-              className="p-3 rounded-lg bg-muted hover:bg-muted/80 transition-colors duration-150"
+              className="p-3 rounded-xl bg-muted hover:bg-muted/80 transition-all duration-200 hover:scale-105"
               title="Copy code"
             >
               {isCopied ? (
@@ -257,12 +265,15 @@ export const ShareSection = ({ onToast }: ShareSectionProps) => {
           </div>
           <button
             onClick={handleReset}
-            className="w-full mt-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors duration-150"
+            className="w-full mt-5 py-2.5 text-sm text-muted-foreground hover:text-foreground transition-colors duration-200 rounded-lg hover:bg-muted"
           >
             Share something else
           </button>
         </div>
       )}
+
+      {/* Quick Retrieve Section */}
+      <QuickRetrieve onToast={onToast} />
     </div>
   );
 };
