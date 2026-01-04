@@ -130,19 +130,21 @@ export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
   };
 
   return (
-    <div className="mt-8 border-t border-border pt-6">
-      <div className="flex items-center gap-2 text-sm font-medium mb-4">
-        <Search className="w-4 h-4" />
-        <span>Retrieve Content</span>
+    <div className="mt-8 pt-6 border-t border-border">
+      <div className="flex items-center gap-3 mb-5">
+        <div className="w-9 h-9 rounded-lg bg-secondary/50 flex items-center justify-center">
+          <Search className="w-4 h-4 text-secondary-foreground" />
+        </div>
+        <div>
+          <span className="text-sm font-medium">Retrieve Content</span>
+          <p className="text-xs text-muted-foreground">Enter a 4-digit code</p>
+        </div>
       </div>
 
-      <div className="bg-muted/50 rounded-xl p-5">
-        <p className="text-sm text-muted-foreground mb-4">
-          Enter a 4-digit code to retrieve shared content
-        </p>
+      <div className="bg-muted/30 rounded-xl p-5 border border-border/50">
 
         {/* Code Input */}
-        <div className="flex justify-center gap-2 mb-4">
+        <div className="flex justify-center gap-2.5 mb-5">
           {code.map((digit, i) => (
             <input
               key={i}
@@ -153,7 +155,7 @@ export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
               value={digit}
               onChange={(e) => handleInputChange(i, e.target.value)}
               onKeyDown={(e) => handleKeyDown(i, e)}
-              className="w-11 h-12 text-center text-lg font-semibold bg-card border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all duration-150"
+              className="w-12 h-14 text-center text-xl font-bold bg-card border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all duration-200"
             />
           ))}
         </div>
@@ -163,12 +165,12 @@ export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
           onClick={handleFetch}
           disabled={!isCodeComplete || isLoading}
           className={`
-            w-full py-2.5 px-4 rounded-lg font-medium text-sm
+            w-full py-3 px-4 rounded-xl font-medium text-sm
             flex items-center justify-center gap-2
-            transition-all duration-150
+            transition-all duration-200 transform
             ${!isCodeComplete || isLoading
               ? 'bg-muted text-muted-foreground cursor-not-allowed'
-              : 'bg-secondary text-secondary-foreground hover:opacity-90'
+              : 'bg-secondary text-secondary-foreground hover:opacity-90 hover:scale-[1.01] active:scale-[0.99]'
             }
           `}
         >
@@ -180,7 +182,7 @@ export const QuickRetrieve = ({ onToast }: QuickRetrieveProps) => {
           ) : (
             <>
               <Search className="w-4 h-4" />
-              Retrieve
+              Retrieve Content
             </>
           )}
         </button>
